@@ -1,0 +1,891 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>html{color-scheme:light dark}body{margin:0;font-family:system-ui,-apple-system,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<!-- Secondary Season - self-hosted build. On a normal web host (e.g. GitHub Pages) all edits
+     save to your browser automatically. Use the Back up / restore button to move data between devices. -->
+<title>Secondary Season</title>
+<meta name="description" content="A calm, milestone-driven tracker for med school secondary essays.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700&display=swap">
+
+<style>
+:root{
+  --bg:#F2F5F3; --surface:#FFFFFF; --surface-2:#F6F9F7; --col:#EEF3F0;
+  --ink:#17211D; --muted:#5C6B65; --faint:#8A968F;
+  --line:#E3E9E5; --line-strong:#CFD8D3;
+  --accent:#0F7A6B; --accent-ink:#0A5A4F; --accent-soft:#DBEEEA; --on-accent:#FFFFFF;
+  --good:#2F7D5B; --good-soft:#DCEEE3;
+  --warn:#9C6A12; --warn-soft:#F6E8CC;
+  --crit:#B24734; --crit-soft:#F5DDD6;
+  --shadow:0 1px 2px rgba(20,40,35,.06), 0 2px 8px rgba(20,40,35,.05);
+  --shadow-lg:0 8px 30px rgba(20,40,35,.16);
+  --radius:12px; --radius-sm:8px;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme:dark){
+    --bg:#0F1512; --surface:#181F1B; --surface-2:#141B17; --col:#121814;
+    --ink:#E8EEEA; --muted:#9EABA4; --faint:#6C7A73;
+    --line:#28312C; --line-strong:#39443D;
+    --accent:#3FB5A0; --accent-ink:#83D8C8; --accent-soft:#12302A; --on-accent:#06120F;
+    --good:#5FC091; --good-soft:#122A1E;
+    --warn:#E0AC53; --warn-soft:#2C2413;
+    --crit:#E5836C; --crit-soft:#2E1B16;
+    --shadow:0 1px 2px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.3);
+    --shadow-lg:0 10px 34px rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0F1512; --surface:#181F1B; --surface-2:#141B17; --col:#121814;
+  --ink:#E8EEEA; --muted:#9EABA4; --faint:#6C7A73;
+  --line:#28312C; --line-strong:#39443D;
+  --accent:#3FB5A0; --accent-ink:#83D8C8; --accent-soft:#12302A; --on-accent:#06120F;
+  --good:#5FC091; --good-soft:#122A1E;
+  --warn:#E0AC53; --warn-soft:#2C2413;
+  --crit:#E5836C; --crit-soft:#2E1B16;
+  --shadow:0 1px 2px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.3);
+  --shadow-lg:0 10px 34px rgba(0,0,0,.5);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Public Sans", system-ui, -apple-system, sans-serif;
+  font-size:14px; line-height:1.5; margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0; font-weight:600; text-wrap:balance}
+button{font-family:inherit; cursor:pointer}
+a{color:var(--accent-ink)}
+.mono{font-family:"IBM Plex Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums}
+.eyebrow{font-family:"IBM Plex Mono", monospace; text-transform:uppercase; letter-spacing:.14em; font-size:11px; color:var(--faint); font-weight:500}
+
+/* ---------- Layout shell ---------- */
+.wrap{max-width:1400px; margin:0 auto; padding-inline:20px}
+header.top{ border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:30; }
+.top-inner{ display:flex; align-items:center; gap:22px; flex-wrap:wrap; padding-block:14px; }
+.brand{display:flex; flex-direction:column; gap:1px; margin-right:auto}
+.brand h1{ font-family:"Fraunces", Georgia, serif; font-weight:600; font-size:23px; letter-spacing:-.01em; line-height:1; }
+.brand .sub{ font-size:12px; color:var(--muted) }
+.metrics{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.metric{ background:var(--surface-2); border:1px solid var(--line); border-radius:var(--radius-sm); padding:8px 13px; display:flex; flex-direction:column; gap:2px; min-width:96px }
+.metric .k{ font-size:11px; color:var(--faint); text-transform:uppercase; letter-spacing:.08em; font-weight:600 }
+.metric .v{ font-family:"IBM Plex Mono", monospace; font-size:18px; font-weight:500; line-height:1.1 }
+.metric .v small{font-size:11px; color:var(--muted); font-weight:400}
+.deadline .v{color:var(--accent-ink)}
+.savedot{display:inline-flex; align-items:center; gap:6px; font-size:12px; color:var(--muted)}
+.savedot i{width:8px;height:8px;border-radius:50%; background:var(--good); display:inline-block}
+.savedot.saving i{background:var(--warn)} .savedot.off i{background:var(--crit)}
+.iconbtn{ background:var(--surface-2); border:1px solid var(--line); color:var(--muted); border-radius:8px; width:34px;height:34px; display:inline-grid; place-items:center; font-size:15px }
+.iconbtn:hover{border-color:var(--line-strong); color:var(--ink)}
+
+.progress-wrap{ padding-bottom:14px }
+.pbar{ height:6px; background:var(--col); border-radius:99px; overflow:hidden; border:1px solid var(--line) }
+.pbar > i{ display:block; height:100%; background:linear-gradient(90deg,var(--accent),var(--accent-ink)); border-radius:99px; transition:width .5s ease }
+
+/* ---------- This week ---------- */
+main{padding-block:22px 40px}
+.section-head{display:flex; align-items:baseline; gap:12px; margin-bottom:12px}
+.section-head h2{ font-family:"Fraunces", serif; font-size:20px; font-weight:600 }
+.section-head .count{ font-size:12px; color:var(--muted) }
+
+.thisweek{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px 18px; margin-bottom:30px; }
+.tw-list{ display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:8px }
+.tw-item{ display:flex; align-items:center; gap:10px; padding:9px 11px; border-radius:var(--radius-sm); border:1px solid var(--line); background:var(--surface-2); text-align:left; width:100%; color:inherit; }
+.tw-item:hover{border-color:var(--accent); background:var(--accent-soft)}
+.tw-item .body{flex:1; min-width:0; display:flex; flex-direction:column; gap:1px}
+.tw-item .name{font-weight:600; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.tw-item .act{font-size:12px; color:var(--muted)}
+.tw-empty{ color:var(--muted); font-size:14px; padding:8px 2px; display:flex; align-items:center; gap:10px }
+.tw-empty b{color:var(--ink); font-weight:600}
+
+/* status chip */
+.chip{ font-family:"IBM Plex Mono", monospace; font-size:11px; font-weight:500; padding:3px 8px; border-radius:99px; white-space:nowrap; border:1px solid transparent }
+.chip.overdue{background:var(--crit-soft); color:var(--crit); border-color:var(--crit)}
+.chip.soon{background:var(--warn-soft); color:var(--warn); border-color:var(--warn)}
+.chip.week{background:var(--accent-soft); color:var(--accent-ink)}
+.chip.future{background:var(--surface-2); color:var(--muted); border-color:var(--line)}
+.chip.done{background:var(--good-soft); color:var(--good); border-color:var(--good)}
+
+/* priority pills */
+.pri{ font-family:"IBM Plex Mono", monospace; font-size:11px; font-weight:500; padding:2px 7px; border-radius:6px; line-height:1.4; }
+.pri.P1{background:var(--accent); color:var(--on-accent)}
+.pri.P2{background:var(--accent-soft); color:var(--accent-ink)}
+.pri.P3{background:var(--surface-2); color:var(--muted); border:1px solid var(--line-strong)}
+.pri.P4{background:transparent; color:var(--faint); border:1px solid var(--line)}
+
+/* ---------- Controls ---------- */
+.controls{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px}
+.filters{display:flex; gap:6px; flex-wrap:wrap}
+.fchip{ background:var(--surface); border:1px solid var(--line); color:var(--muted); border-radius:99px; padding:5px 13px; font-size:12.5px; font-weight:600 }
+.fchip[aria-pressed="true"]{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+.search{ margin-left:auto; display:flex; align-items:center; gap:7px; background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:6px 12px }
+.search input{border:0; background:transparent; color:var(--ink); font:inherit; font-size:13px; outline:none; width:150px}
+.search svg{flex:none; color:var(--faint)}
+
+/* ---------- Board ---------- */
+.board-scroll{ overflow-x:auto; padding-bottom:12px; margin-inline:-20px; padding-inline:20px }
+.board{ display:flex; gap:12px; min-width:min-content; align-items:flex-start }
+.column{ flex:0 0 232px; background:var(--col); border:1px solid var(--line); border-radius:var(--radius); display:flex; flex-direction:column; max-height:none }
+.col-head{ display:flex; align-items:center; gap:8px; padding:11px 13px 9px; position:sticky; top:0 }
+.col-head .dot{width:8px;height:8px;border-radius:50%; flex:none}
+.col-head h3{ font-size:12.5px; font-weight:700; letter-spacing:.01em; text-transform:none }
+.col-head .cnt{ margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:11px; color:var(--faint); background:var(--surface); border:1px solid var(--line); border-radius:99px; padding:1px 7px }
+.col-body{ display:flex; flex-direction:column; gap:8px; padding:0 10px 12px; min-height:44px }
+.column.dragover{ border-color:var(--accent); background:var(--accent-soft) }
+.column.dragover .col-body{outline:2px dashed var(--accent); outline-offset:-4px; border-radius:8px}
+
+.card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-sm); padding:10px 11px; box-shadow:var(--shadow); cursor:grab; display:flex; flex-direction:column; gap:8px; }
+.card:hover{border-color:var(--line-strong)}
+.card.dragging{opacity:.45}
+.card .row1{display:flex; align-items:flex-start; gap:8px}
+.card .sname{font-weight:600; font-size:13.5px; line-height:1.25; flex:1}
+.card .meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.card .subrow{display:flex; align-items:center; gap:8px; justify-content:space-between}
+.card .essays{font-size:11.5px; color:var(--muted); display:inline-flex; align-items:center; gap:5px}
+.card .mini{ height:4px; width:46px; background:var(--col); border-radius:99px; overflow:hidden; border:1px solid var(--line)}
+.card .mini > i{display:block; height:100%; background:var(--accent)}
+.card .plink{color:var(--faint); font-size:12px; display:inline-flex; align-items:center; gap:3px; text-decoration:none}
+.card .plink:hover{color:var(--accent-ink)}
+
+/* ---------- Detail modal ---------- */
+.scrim{ position:fixed; inset:0; background:rgba(15,25,21,.5); z-index:50; display:none; opacity:0; transition:opacity .2s }
+.scrim.open{display:block; opacity:1}
+.drawer{ position:fixed; top:0; right:0; height:100%; width:min(480px,100%); background:var(--surface); z-index:60; box-shadow:var(--shadow-lg); transform:translateX(100%); transition:transform .24s cubic-bezier(.4,0,.2,1); display:flex; flex-direction:column; }
+.drawer.open{transform:none}
+.dr-head{ padding:18px 20px 14px; border-bottom:1px solid var(--line); display:flex; gap:12px; align-items:flex-start }
+.dr-head .t{flex:1}
+.dr-head h2{font-family:"Fraunces",serif; font-size:20px; line-height:1.15; margin-bottom:6px}
+.dr-body{ overflow-y:auto; padding:18px 20px 30px; display:flex; flex-direction:column; gap:20px }
+.fieldset{display:flex; flex-direction:column; gap:9px}
+.fieldset > .lbl{ font-size:11px; text-transform:uppercase; letter-spacing:.1em; color:var(--faint); font-weight:700 }
+label.field{display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted)}
+input[type=text], input[type=url], input[type=date], textarea, select{
+  font:inherit; font-size:13.5px; color:var(--ink); background:var(--surface-2);
+  border:1px solid var(--line); border-radius:var(--radius-sm); padding:8px 10px; width:100%;
+}
+input:focus, textarea:focus, select:focus{outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent)}
+textarea{resize:vertical; min-height:58px; line-height:1.45}
+.date-grid{display:grid; grid-template-columns:1fr 1fr; gap:9px}
+.date-row{display:flex; flex-direction:column; gap:3px}
+.date-row .dl{display:flex; justify-content:space-between; align-items:center; font-size:11.5px}
+.date-row .dl b{color:var(--ink); font-weight:600}
+.date-row .auto{color:var(--faint); font-family:"IBM Plex Mono",monospace; font-size:10.5px}
+.date-row input[type=date]{padding:6px 8px; font-family:"IBM Plex Mono",monospace; font-size:12.5px}
+.date-row.ovr input[type=date]{border-color:var(--accent); background:var(--accent-soft)}
+
+.essay{ border:1px solid var(--line); border-radius:var(--radius-sm); padding:11px; display:flex; flex-direction:column; gap:8px; background:var(--surface-2) }
+.essay .etop{display:flex; align-items:center; gap:8px}
+.essay .etop .en{font-weight:600; font-size:12.5px; flex:1}
+.essay .erow{display:flex; gap:9px; align-items:flex-end}
+.essay .erow .wl{width:120px; flex:none}
+.chkline{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--ink); cursor:pointer; padding:7px 0}
+.chkline input{width:16px;height:16px; accent-color:var(--accent); cursor:pointer}
+.btn{ border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); border-radius:var(--radius-sm); padding:8px 12px; font-size:13px; font-weight:600 }
+.btn:hover{border-color:var(--accent); color:var(--accent-ink)}
+.btn.ghost{border-style:dashed; color:var(--muted); width:100%; justify-content:center; display:flex; gap:6px}
+.btn.sm{padding:5px 9px; font-size:12px}
+.btn.danger:hover{border-color:var(--crit); color:var(--crit)}
+.pill-link{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--accent-ink); text-decoration:none; font-weight:600}
+.stage-select{display:flex; align-items:center; gap:9px}
+.hint{font-size:12px; color:var(--faint); line-height:1.4}
+.footer-note{color:var(--faint); font-size:12px; text-align:center; margin-top:26px; padding-top:16px; border-top:1px solid var(--line)}
+.footer-note button{background:none;border:0;color:var(--accent-ink); font:inherit; text-decoration:underline; padding:0}
+
+.notice{ display:flex; align-items:center; gap:14px; padding:12px 16px; border-radius:var(--radius); margin-bottom:22px; font-size:13px; line-height:1.45; }
+.notice b{font-weight:700}
+.notice .btn{flex:none; white-space:nowrap}
+.notice.warn{ background:var(--warn-soft); border:1px solid var(--warn); color:var(--ink) }
+.notice.crit{ background:var(--crit-soft); border:1px solid var(--crit); color:var(--ink) }
+
+.bmodal{ position:fixed; z-index:70; left:50%; top:50%; transform:translate(-50%,-48%) scale(.98); opacity:0; pointer-events:none; width:min(560px,92vw); max-height:88vh; overflow:auto; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow-lg); padding:20px; transition:opacity .18s, transform .18s; }
+.bmodal.open{opacity:1; transform:translate(-50%,-50%) scale(1); pointer-events:auto}
+.bmodal h3{font-family:"Fraunces",serif; font-size:19px; margin-bottom:4px}
+.bmodal p{margin:0 0 6px; color:var(--muted); font-size:12.5px}
+.bmodal textarea{font-family:"IBM Plex Mono",monospace; font-size:11.5px; min-height:96px}
+.bmodal .brow{display:flex; gap:8px; align-items:center; margin:6px 0 16px}
+.bmsg{font-size:12.5px; color:var(--accent-ink); min-height:16px}
+
+@media (max-width:640px){
+  .wrap{padding-inline:14px}
+  .board-scroll{margin-inline:-14px; padding-inline:14px}
+  .brand h1{font-size:20px}
+  .metric{min-width:80px; padding:6px 10px}
+  .metric .v{font-size:15px}
+  .drawer{width:100%}
+  .search{margin-left:0; width:100%}
+  .search input{width:100%}
+}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="top-inner">
+      <div class="brand">
+        <h1>Secondary Season</h1>
+        <span class="sub">Medical school application tracker</span>
+      </div>
+      <div class="metrics" id="metrics"></div>
+      <span class="savedot" id="savedot"><i></i><span id="savetext">Saved</span></span>
+      <button class="iconbtn" id="themeBtn" title="Toggle light / dark" aria-label="Toggle theme">◐</button>
+    </div>
+    <div class="progress-wrap">
+      <div class="pbar"><i id="pbar" style="width:0%"></i></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="notice" id="notice" hidden></div>
+  <section class="thisweek">
+    <div class="section-head">
+      <h2>This week</h2>
+      <span class="count" id="twcount"></span>
+    </div>
+    <div class="tw-list" id="twlist"></div>
+  </section>
+
+  <div class="controls">
+    <div class="filters" id="filters">
+      <button class="fchip" data-pri="all" aria-pressed="true">All</button>
+      <button class="fchip" data-pri="P1" aria-pressed="false">P1</button>
+      <button class="fchip" data-pri="P2" aria-pressed="false">P2</button>
+      <button class="fchip" data-pri="P3" aria-pressed="false">P3</button>
+      <button class="fchip" data-pri="P4" aria-pressed="false">P4</button>
+    </div>
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4-4"/></svg>
+      <input id="search" type="text" placeholder="Find a school…" autocomplete="off">
+    </div>
+  </div>
+
+  <div class="board-scroll">
+    <div class="board" id="board"></div>
+  </div>
+
+  <div class="footer-note">
+    Dates auto-schedule from each secondary's arrival, weighted by priority, toward your Oct 1 goal — override any date inside a school.
+    &nbsp;·&nbsp; <button id="backupBtn">Back up / restore data</button>
+    &nbsp;·&nbsp; <button id="resetBtn">Reset to original list</button>
+  </div>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true"></aside>
+
+<div class="scrim" id="bscrim"></div>
+<div class="bmodal" id="bmodal" role="dialog" aria-label="Back up or restore data">
+  <h3>Back up &amp; restore</h3>
+  <p>Your current tracker as text. Copy it somewhere safe (a note, an email to yourself) so you can restore it anywhere.</p>
+  <textarea id="bexport" readonly></textarea>
+  <div class="brow"><button class="btn" id="bcopy">Copy</button><button class="btn" id="bclose2">Close</button></div>
+  <p><b>Restore:</b> paste a previous backup below and load it. This replaces everything currently on the board.</p>
+  <textarea id="bimport" placeholder="Paste backup text here…"></textarea>
+  <div class="brow"><button class="btn" id="bload">Load backup</button><span class="bmsg" id="bmsg"></span></div>
+</div>
+
+<script>
+"use strict";
+/* ============================================================
+   Secondary Season — med school secondary tracker
+   Persistence: db capability, single doc "tracker/state"
+   ============================================================ */
+
+const STAGES = [
+  {id:"awaiting",  label:"Awaiting 2°", dot:"var(--faint)"},
+  {id:"received",  label:"Received",         dot:"var(--line-strong)"},
+  {id:"outline",   label:"Outline",          dot:"var(--warn)"},
+  {id:"draft",     label:"First draft",      dot:"var(--warn)"},
+  {id:"review",    label:"In review",        dot:"var(--accent)"},
+  {id:"revisions", label:"Revising",         dot:"var(--accent)"},
+  {id:"submitted", label:"Submitted",        dot:"var(--good)"},
+  {id:"complete",  label:"Complete",         dot:"var(--good)"},
+];
+const STAGE_INDEX = Object.fromEntries(STAGES.map((s,i)=>[s.id,i]));
+// milestones that carry a target date, in order, with fraction of the received->submitted window
+const MILES = [
+  {id:"outline",   label:"Outline",         short:"outline",  f:0.15},
+  {id:"draft",     label:"First draft",     short:"draft",    f:0.45},
+  {id:"review",    label:"Sent for review", short:"review",   f:0.65},
+  {id:"revisions", label:"Revisions done",  short:"revise",   f:0.85},
+  {id:"submitted", label:"Submitted",       short:"submit",   f:1.00},
+];
+
+/* -------- date helpers (local, DST-safe) -------- */
+function parseD(s){ if(!s) return null; const [y,m,d]=s.split("-").map(Number); return new Date(y,m-1,d); }
+function fmtISO(dt){ return dt.getFullYear()+"-"+String(dt.getMonth()+1).padStart(2,"0")+"-"+String(dt.getDate()).padStart(2,"0"); }
+function addDays(dt,n){ const x=new Date(dt); x.setDate(x.getDate()+n); return x; }
+function today(){ const n=new Date(); return new Date(n.getFullYear(),n.getMonth(),n.getDate()); }
+function daysBetween(a,b){ return Math.round((b-a)/86400000); }
+function fmtNice(dt){ return dt ? dt.toLocaleDateString(undefined,{month:"short",day:"numeric"}) : "—"; }
+
+/* -------- seed data (from Suraj's Google Sheet) -------- */
+function seedSchools(){
+  const R = [
+    // name, priority, rank, url, received(ISO|null), notes
+    ["Harvard (HMS)","P1","1","https://admissions.hms.harvard.edu/","2026-08-31",""],
+    ["Johns Hopkins","P1","2","",null,""],
+    ["UCSF","P1","3","",null,""],
+    ["Duke","P1","4","","2026-09-08",""],
+    ["Penn (Perelman)","P1","5","","2026-09-08",""],
+    ["Stanford","P1","6","https://medadmit.stanford.edu/","2026-09-01",""],
+    ["Columbia (VP&S)","P1","7","","2026-09-08",""],
+    ["NYU (Grossman)","P1","8","","2026-09-08",""],
+    ["WashU","P1","10","",null,""],
+    ["Yale","P1","11","","2026-09-08",""],
+    ["Cleveland Clinic (CCLCM)","P1","13","","2026-09-09",""],
+    ["Mayo (Alix)","P1","14","https://account.mayoclinic.org/","2026-09-03",""],
+    ["Georgetown","P1","43","",null,""],
+    ["U Arizona COM–Phoenix","P1","64","https://gateway.aamc.liaisoncas.com/","2026-09-01",""],
+    ["U Arizona COM–Tucson","P1","127","https://applytucson.medicine.arizona.edu/","2026-09-01",""],
+    ["ASU School of Medicine","P1","Unranked","",null,""],
+    ["Alice Walton (ALWSOM)","P1","Unranked","","2026-09-08",""],
+    ["Vanderbilt","P2","9","","2026-09-09",""],
+    ["Michigan","P2","12","","2026-09-08",""],
+    ["Cornell (Weill)","P2","15","",null,""],
+    ["Northwestern (Feinberg)","P2","16","","2026-09-08",""],
+    ["Pittsburgh","P2","17","","2026-09-09",""],
+    ["UChicago (Pritzker)","P2","18","","2026-09-08",""],
+    ["Icahn / Mount Sinai","P2","19","","2026-09-09",""],
+    ["Emory","P2","20","","2026-09-08",""],
+    ["UCLA (Geffen)","P2","24","","2026-09-08",""],
+    ["Albert Einstein","P2","25","","2026-09-08",""],
+    ["UCSD","P2","27","",null,""],
+    ["UVA","P3","28","",null,""],
+    ["USC (Keck)","P3","30","",null,""],
+    ["LSU Health Shreveport","P4","143","",null,""],
+    ["Wisconsin","P4","40","",null,""],
+    ["Maryland","P4","59","",null,""],
+    ["Washington (UW)","P4","","",null,"Adith has a tie to the area?"],
+  ];
+  return R.map((r,i)=>({
+    id:"s"+i,
+    name:r[0], priority:r[1], rank:r[2], url:r[3],
+    received:r[4],
+    stage:r[4]?"received":"awaiting",
+    overrides:{}, // {milestoneId: ISO}
+    essays:[],
+    complete:{fee:false, letters:false},
+    notes:r[5]||""
+  }));
+}
+
+function defaultState(){
+  return {
+    v:2,
+    settings:{ finalDeadline:"2026-10-01", turnaround:{P1:10,P2:14,P3:21,P4:21} },
+    schools: seedSchools(),
+    updatedBy:null, updatedAt:0
+  };
+}
+
+/* ============================================================
+   State + persistence
+   ============================================================ */
+const CLIENT = "c"+Math.random().toString(36).slice(2,9);
+const LS_KEY = "secondary-season-state-v2";
+let state = defaultState();
+let dbRef = null, seeded = false, saveTimer = null, applyingRemote = false, dirty = false;
+let filterPri = "all", searchTerm = "", openId = null;
+
+function persistLocal(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(_){} }
+function loadLocal(){
+  try{ const raw=localStorage.getItem(LS_KEY); if(raw){ const d=JSON.parse(raw); if(d&&d.schools) state=migrate(d); } }catch(_){}
+}
+
+function schoolById(id){ return state.schools.find(s=>s.id===id); }
+
+/* compute the target date for a milestone of a school (override wins) */
+function milestoneDate(sch, mid){
+  if(sch.overrides && sch.overrides[mid]) return parseD(sch.overrides[mid]);
+  if(!sch.received) return null;
+  const R = parseD(sch.received);
+  const T = state.settings.turnaround[sch.priority] || 14;
+  const m = MILES.find(x=>x.id===mid);
+  if(!m) return null;
+  return addDays(R, Math.round(m.f*T));
+}
+function autoMilestoneDate(sch, mid){
+  if(!sch.received) return null;
+  const R = parseD(sch.received);
+  const T = state.settings.turnaround[sch.priority] || 14;
+  const m = MILES.find(x=>x.id===mid);
+  return addDays(R, Math.round(m.f*T));
+}
+
+/* the next action a school is working toward */
+function nextAction(sch){
+  const idx = STAGE_INDEX[sch.stage];
+  if(sch.stage==="awaiting" || sch.stage==="submitted" || sch.stage==="complete") return null;
+  // next milestone = first MILE whose stage index > current stage index
+  for(const m of MILES){
+    if(STAGE_INDEX[m.id] > idx){
+      return {mid:m.id, label:m.label, date:milestoneDate(sch,m.id)};
+    }
+  }
+  return null;
+}
+
+function statusFor(date){
+  if(!date) return {cls:"future", txt:""};
+  const t = today(); const d = daysBetween(t,date);
+  if(d < -3) return {cls:"overdue", txt:(-d)+"d over"};   // clearly behind -> red
+  if(d < 0)  return {cls:"soon", txt:(-d)+"d over"};       // just slipped -> amber
+  if(d===0)  return {cls:"soon", txt:"today"};
+  if(d<=2)   return {cls:"soon", txt:"in "+d+"d"};
+  if(d<=7)   return {cls:"week", txt:"in "+d+"d"};
+  return {cls:"future", txt:fmtNice(date)};
+}
+
+/* ============================================================
+   Persistence wiring
+   ============================================================ */
+let mode = "init";   // "db" = durable+synced | "local" = this-browser only | "none" = cannot persist
+let seenServer = false;   // have we received at least one server-definitive snapshot?
+function lsOK(){ try{ localStorage.setItem("__ss_probe","1"); const v=localStorage.getItem("__ss_probe"); localStorage.removeItem("__ss_probe"); return v==="1"; }catch(_){ return false; } }
+
+async function initDb(){
+  let db=null;
+  const hasUse = !!(window.claude && typeof window.claude.use === "function");
+  try{ db = hasUse ? await window.claude.use("db") : null; }
+  catch(e){ db=null; }
+  if(!db){
+    // No shared db in this view (e.g. the inline chat preview). Fall back to local, and be honest if even that won't survive.
+    mode = lsOK() ? "local" : "none";
+    updateNotice();
+    setSave(mode==="none"?"off":"saved", mode==="none"?"Not saving here":"Saved on this device");
+    return;
+  }
+  mode = "db";
+  updateNotice();
+  dbRef = db.doc("tracker/state");
+  dbRef.onSnapshot((snap)=>{
+    const meta = snap.metadata||{};
+    if(!snap.exists){
+      // CRITICAL: a cache-only "empty" is NOT proof the store is empty — it precedes the server reply.
+      // Only seed when the SERVER confirms there is genuinely nothing there, and only once.
+      if(!meta.fromCache && !seenServer){ seenServer = true; if(!seeded){ seeded = true; save(); } }
+      return;
+    }
+    if(!meta.fromCache) seenServer = true;
+    const data = snap.data();
+    if(meta.hasPendingWrites) return;                              // our own optimistic write echoing back
+    if(!data) return;
+    if(data.updatedBy===CLIENT){ if(!dirty) setSave("saved","Saved"); return; }
+    if(dirty) return;                                              // never clobber unsaved local edits
+    if((data.updatedAt||0) <= (state.updatedAt||0)) return;        // ignore stale / older snapshots
+    // A genuinely newer version from the store (this or another device): adopt it.
+    applyingRemote = true;
+    state = migrate(data);
+    applyingRemote = false;
+    persistLocal();
+    render();
+    if(openId) refreshDrawerLive();
+    setSave("saved","Saved");
+  }, (err)=>{ setSave("saved","Saved on this device"); });
+}
+function migrate(data){
+  const d = Object.assign(defaultState(), data);
+  d.settings = Object.assign(defaultState().settings, data.settings||{});
+  (d.schools||[]).forEach(s=>{ s.overrides=s.overrides||{}; s.essays=s.essays||[]; s.complete=s.complete||{fee:false,letters:false}; });
+  return d;
+}
+function scheduleSave(){
+  if(applyingRemote) return;
+  dirty = true;
+  state.updatedBy = CLIENT; state.updatedAt = Date.now();
+  persistLocal();                       // immediate, synchronous local safety net
+  setSave("saving","Saving…");
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 600);
+}
+async function save(){
+  state.updatedBy = CLIENT; state.updatedAt = Date.now();
+  persistLocal();
+  dirty = false;
+  if(!dbRef){ setSave("saved","Saved on this device"); return; }
+  try{ await dbRef.set(state); setSave("saved","Saved"); }
+  catch(e){ setSave("saved","Saved on this device"); }
+}
+function setSave(cls,txt){
+  const el=document.getElementById("savedot"); const t=document.getElementById("savetext");
+  if(!el) return; el.className="savedot"+(cls==="saving"?" saving":cls==="off"?" off":""); t.textContent=txt;
+}
+function updateNotice(){
+  const n=document.getElementById("notice"); if(!n) return;
+  if(mode==="db"){ n.hidden=true; return; }
+  n.hidden=false;
+  if(mode==="none"){
+    n.className="notice crit";
+    n.innerHTML = `<span><b>This inline preview can’t save your changes.</b> Open Secondary Season in its own tab — use the open-in-new-window / full-screen button on the artifact — and your work will save and sync automatically. Meanwhile, use <b>Back up</b> to copy your data out so nothing is lost.</span><button class="btn sm" id="notice-backup">Back up now</button>`;
+  } else {
+    n.className="notice warn";
+    n.innerHTML = `<span>Saving to <b>this browser only</b>. Open the tracker in its own tab (full-screen button) for cross-device sync. <b>Back up</b> anytime to copy your data out.</span><button class="btn sm" id="notice-backup">Back up</button>`;
+  }
+  const b=document.getElementById("notice-backup"); if(b) b.onclick=openBackup;
+}
+
+/* ---- Manual backup / restore: works in ANY context (copy & paste JSON) ---- */
+function openBackup(){
+  const ta=document.getElementById("bexport");
+  ta.value = JSON.stringify(state);
+  document.getElementById("bimport").value = "";
+  document.getElementById("bmsg").textContent = "";
+  document.getElementById("bscrim").classList.add("open");
+  document.getElementById("bmodal").classList.add("open");
+  ta.focus(); ta.select();
+}
+function closeBackup(){ document.getElementById("bscrim").classList.remove("open"); document.getElementById("bmodal").classList.remove("open"); }
+function doCopy(){
+  const ta=document.getElementById("bexport"); ta.focus(); ta.select();
+  let ok=false;
+  try{ ok=document.execCommand("copy"); }catch(_){}
+  if(navigator.clipboard){ navigator.clipboard.writeText(ta.value).then(()=>{},()=>{}); ok=true; }
+  document.getElementById("bmsg").textContent = ok? "Copied to clipboard — paste it somewhere safe." : "Select all the text above and copy it manually.";
+}
+function doImport(){
+  const raw=document.getElementById("bimport").value.trim();
+  const msg=document.getElementById("bmsg");
+  if(!raw){ msg.textContent="Paste a backup into the lower box first."; return; }
+  let parsed; try{ parsed=JSON.parse(raw); }catch(_){ msg.textContent="That doesn’t look like valid backup text."; return; }
+  if(!parsed || !Array.isArray(parsed.schools)){ msg.textContent="That backup is missing its school data."; return; }
+  state = migrate(parsed);
+  scheduleSave(); render(); if(openId) refreshDrawerLive();
+  msg.textContent="Restored "+state.schools.length+" schools.";
+  setTimeout(closeBackup, 700);
+}
+
+/* ============================================================
+   Rendering
+   ============================================================ */
+function render(){ renderMetrics(); renderThisWeek(); renderBoard(); }
+
+function renderMetrics(){
+  const total = state.schools.length;
+  const submitted = state.schools.filter(s=>s.stage==="submitted"||s.stage==="complete").length;
+  const arrived = state.schools.filter(s=>s.received).length;
+  const dl = parseD(state.settings.finalDeadline);
+  const daysLeft = daysBetween(today(), dl);
+  const pct = total? Math.round(submitted/total*100):0;
+  document.getElementById("metrics").innerHTML = `
+    <div class="metric"><span class="k">Submitted</span><span class="v">${submitted}<small> / ${total}</small></span></div>
+    <div class="metric"><span class="k">Secondaries in</span><span class="v">${arrived}<small> / ${total}</small></span></div>
+    <div class="metric deadline"><span class="k">To Oct 1</span><span class="v">${daysLeft>=0?daysLeft:0}<small> days</small></span></div>`;
+  document.getElementById("pbar").style.width = pct+"%";
+}
+
+function renderThisWeek(){
+  const items=[];
+  for(const s of state.schools){
+    const na = nextAction(s);
+    if(na && na.date){
+      const d = daysBetween(today(), na.date);
+      if(d<=7) items.push({s, na, d});
+    }
+  }
+  items.sort((a,b)=> a.d-b.d || a.s.priority.localeCompare(b.s.priority));
+  const list=document.getElementById("twlist");
+  document.getElementById("twcount").textContent = items.length? items.length+" action"+(items.length>1?"s":"")+" due now or soon" : "";
+  if(!items.length){
+    list.innerHTML = `<div class="tw-empty"><b>All clear.</b> Nothing due in the next 7 days — new secondaries will show up here as they arrive.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(({s,na})=>{
+    const st = statusFor(na.date);
+    return `<button class="tw-item" data-open="${s.id}">
+      <span class="pri ${s.priority}">${s.priority}</span>
+      <span class="body"><span class="name">${esc(s.name)}</span><span class="act">${na.label} · ${fmtNice(na.date)}</span></span>
+      <span class="chip ${st.cls}">${st.txt||fmtNice(na.date)}</span>
+    </button>`;
+  }).join("");
+}
+
+function visible(s){
+  if(filterPri!=="all" && s.priority!==filterPri) return false;
+  if(searchTerm && !s.name.toLowerCase().includes(searchTerm)) return false;
+  return true;
+}
+
+function renderBoard(){
+  const board=document.getElementById("board");
+  const byStage = Object.fromEntries(STAGES.map(s=>[s.id,[]]));
+  state.schools.filter(visible).forEach(s=> byStage[s.stage].push(s));
+  // sort each column by priority then next-date
+  for(const k in byStage){
+    byStage[k].sort((a,b)=>{
+      const pa=a.priority.localeCompare(b.priority); if(pa) return pa;
+      const da=(nextAction(a)||{}).date, dbb=(nextAction(b)||{}).date;
+      if(da&&dbb) return da-dbb; if(da) return -1; if(dbb) return 1; return 0;
+    });
+  }
+  board.innerHTML = STAGES.map(st=>{
+    const cards = byStage[st.id];
+    return `<div class="column" data-stage="${st.id}">
+      <div class="col-head"><span class="dot" style="background:${st.dot}"></span><h3>${st.label}</h3><span class="cnt">${cards.length}</span></div>
+      <div class="col-body">${cards.map(cardHTML).join("")}</div>
+    </div>`;
+  }).join("");
+  bindDnD();
+}
+
+function cardHTML(s){
+  const na = nextAction(s);
+  let chip="";
+  if(na && na.date){ const st=statusFor(na.date); const sh=(MILES.find(m=>m.id===na.mid)||{}).short||""; chip=`<span class="chip ${st.cls}">${sh} · ${st.txt||fmtNice(na.date)}</span>`; }
+  else if(s.stage==="complete") chip=`<span class="chip done">complete</span>`;
+  else if(s.stage==="submitted") chip=`<span class="chip done">submitted</span>`;
+  else if(s.stage==="awaiting") chip=`<span class="chip future">not received</span>`;
+  const eDone = s.essays.filter(e=>e.done).length, eTot=s.essays.length;
+  const ePct = eTot? Math.round(eDone/eTot*100):0;
+  const essays = eTot
+    ? `<span class="essays"><span class="mini"><i style="width:${ePct}%"></i></span>${eDone}/${eTot} essays</span>`
+    : `<span class="essays" style="color:var(--faint)">no essays yet</span>`;
+  const link = s.url? `<a class="plink" href="${esc(s.url)}" target="_blank" rel="noopener" title="Open portal" onclick="event.stopPropagation()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14 3h7v7M21 3l-9 9M10 5H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>portal</a>` : "";
+  return `<div class="card" draggable="true" data-id="${s.id}" data-open="${s.id}">
+    <div class="row1"><span class="sname">${esc(s.name)}</span><span class="pri ${s.priority}">${s.priority}</span></div>
+    ${chip?`<div class="meta">${chip}</div>`:""}
+    <div class="subrow">${essays}${link}</div>
+  </div>`;
+}
+
+function esc(t){ return String(t==null?"":t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* ============================================================
+   Drag & drop
+   ============================================================ */
+let dragId=null;
+function bindDnD(){
+  document.querySelectorAll(".card").forEach(c=>{
+    c.addEventListener("dragstart",e=>{ dragId=c.dataset.id; c.classList.add("dragging"); e.dataTransfer.effectAllowed="move"; try{e.dataTransfer.setData("text/plain",dragId);}catch(_){}});
+    c.addEventListener("dragend",()=>{ c.classList.remove("dragging"); dragId=null; document.querySelectorAll(".column").forEach(x=>x.classList.remove("dragover")); });
+  });
+  document.querySelectorAll(".column").forEach(col=>{
+    col.addEventListener("dragover",e=>{ e.preventDefault(); col.classList.add("dragover"); });
+    col.addEventListener("dragleave",e=>{ if(!col.contains(e.relatedTarget)) col.classList.remove("dragover"); });
+    col.addEventListener("drop",e=>{
+      e.preventDefault(); col.classList.remove("dragover");
+      const id = dragId || (e.dataTransfer&&e.dataTransfer.getData("text/plain"));
+      const st = col.dataset.stage;
+      const s = schoolById(id);
+      if(s && s.stage!==st){ moveTo(s, st); }
+    });
+  });
+}
+function moveTo(s, st){
+  s.stage = st;
+  if(st!=="awaiting" && !s.received){ s.received = fmtISO(today()); } // entering pipeline w/o a date -> assume today
+  scheduleSave(); render(); if(openId===s.id) refreshDrawerLive();
+}
+
+/* ============================================================
+   Detail drawer
+   ============================================================ */
+function openDrawer(id){
+  const s = schoolById(id); if(!s) return; openId=id;
+  const scrim=document.getElementById("scrim"), dr=document.getElementById("drawer");
+  dr.innerHTML = drawerHTML(s);
+  bindDrawer(s);
+  scrim.classList.add("open"); dr.classList.add("open"); dr.setAttribute("aria-hidden","false");
+}
+function closeDrawer(){
+  openId=null;
+  document.getElementById("scrim").classList.remove("open");
+  const dr=document.getElementById("drawer"); dr.classList.remove("open"); dr.setAttribute("aria-hidden","true");
+}
+function refreshDrawerLive(){ /* board changed underneath; keep drawer as-is unless stage select needs sync */
+  const s=schoolById(openId); if(!s) { closeDrawer(); return; }
+  const sel=document.getElementById("dr-stage"); if(sel && sel.value!==s.stage) sel.value=s.stage;
+}
+
+function drawerHTML(s){
+  const stageOpts = STAGES.map(st=>`<option value="${st.id}" ${st.id===s.stage?"selected":""}>${st.label}</option>`).join("");
+  const dateRows = MILES.map(m=>{
+    const ovr = s.overrides[m.id];
+    const auto = autoMilestoneDate(s, m.id);
+    const val = ovr ? ovr : (auto? fmtISO(auto):"");
+    return `<div class="date-row ${ovr?"ovr":""}" data-mid="${m.id}">
+      <div class="dl"><b>${m.label}</b>${ovr?`<button class="btn sm" data-clear="${m.id}" title="Revert to auto">auto</button>`:`<span class="auto">${auto?"auto":"needs 2° date"}</span>`}</div>
+      <input type="date" id="dt-${m.id}" value="${val}" ${s.received||ovr?"":"disabled"}>
+    </div>`;
+  }).join("");
+  const essaysHTML = s.essays.map((e,i)=>essayHTML(e,i)).join("") ||
+    `<div class="hint">No essays added yet. Add each prompt as it comes in — the pulled text is often stale, so type or paste the real prompt and word limit.</div>`;
+  return `
+  <div class="dr-head">
+    <div class="t">
+      <h2>${esc(s.name)}</h2>
+      <div class="meta" style="display:flex;gap:8px;align-items:center">
+        <span class="pri ${s.priority}">${s.priority}</span>
+        ${s.rank?`<span class="hint mono">Rank ${esc(s.rank)}</span>`:""}
+        ${s.url?`<a class="pill-link" href="${esc(s.url)}" target="_blank" rel="noopener">Portal ↗</a>`:""}
+      </div>
+    </div>
+    <button class="iconbtn" id="dr-close" aria-label="Close">✕</button>
+  </div>
+  <div class="dr-body">
+    <div class="fieldset">
+      <span class="lbl">Status</span>
+      <div class="stage-select">
+        <select id="dr-stage" style="flex:1">${stageOpts}</select>
+      </div>
+      <div class="date-grid" style="grid-template-columns:1fr 1fr">
+        <label class="field">Priority
+          <select id="dr-pri">${["P1","P2","P3","P4"].map(p=>`<option ${p===s.priority?"selected":""}>${p}</option>`).join("")}</select>
+        </label>
+        <label class="field">Secondary received
+          <input type="date" id="dr-received" value="${s.received||""}">
+        </label>
+      </div>
+    </div>
+
+    <div class="fieldset">
+      <span class="lbl">Milestone targets</span>
+      <div class="hint">Auto-scheduled from the arrival date (${s.priority}: ${state.settings.turnaround[s.priority]}-day turnaround). Edit any date to override.</div>
+      <div class="date-grid">${dateRows}</div>
+    </div>
+
+    <div class="fieldset">
+      <span class="lbl">Essays</span>
+      <div id="essayWrap" style="display:flex;flex-direction:column;gap:9px">${essaysHTML}</div>
+      <button class="btn ghost" id="addEssay">+ Add essay / prompt</button>
+    </div>
+
+    <div class="fieldset">
+      <span class="lbl">Complete-status checklist</span>
+      <label class="chkline"><input type="checkbox" id="ck-fee" ${s.complete.fee?"checked":""}> Secondary fee paid</label>
+      <label class="chkline"><input type="checkbox" id="ck-letters" ${s.complete.letters?"checked":""}> Letters of rec assigned</label>
+      <label class="field" style="margin-top:6px">Portal URL
+        <input type="url" id="dr-url" value="${esc(s.url)}" placeholder="https://…">
+      </label>
+    </div>
+
+    <div class="fieldset">
+      <span class="lbl">Notes</span>
+      <textarea id="dr-notes" placeholder="Angle ideas, reminders, quirks about this school…">${esc(s.notes)}</textarea>
+    </div>
+
+    <button class="btn danger sm" id="dr-delete" style="align-self:flex-start">Remove this school</button>
+  </div>`;
+}
+function essayHTML(e,i){
+  return `<div class="essay" data-ei="${i}">
+    <div class="etop">
+      <input type="checkbox" class="e-done" ${e.done?"checked":""} title="Mark done" style="width:16px;height:16px;accent-color:var(--accent)">
+      <span class="en">Essay ${i+1}</span>
+      <button class="btn sm danger e-del" title="Remove">✕</button>
+    </div>
+    <textarea class="e-prompt" placeholder="Paste or type the prompt…">${esc(e.prompt||"")}</textarea>
+    <div class="erow">
+      <label class="field wl">Word / char limit
+        <input type="text" class="e-limit" value="${esc(e.limit||"")}" placeholder="e.g. 250 words">
+      </label>
+    </div>
+  </div>`;
+}
+
+function bindDrawer(s){
+  const $=id=>document.getElementById(id);
+  $("dr-close").onclick = closeDrawer;
+  $("dr-stage").onchange = e=>{ s.stage=e.target.value; if(s.stage!=="awaiting"&&!s.received){s.received=fmtISO(today()); const r=$("dr-received"); if(r)r.value=s.received;} scheduleSave(); renderNonDrawer(); };
+  $("dr-pri").onchange = e=>{ s.priority=e.target.value; scheduleSave(); renderNonDrawer(); refreshDates(s); };
+  $("dr-received").onchange = e=>{ s.received=e.target.value||null; if(s.received&&s.stage==="awaiting")s.stage="received"; scheduleSave(); renderNonDrawer(); refreshDates(s); };
+  $("dr-url").oninput = e=>{ s.url=e.target.value.trim(); scheduleSave(); renderNonDrawer(); };
+  $("dr-notes").oninput = e=>{ s.notes=e.target.value; scheduleSave(); };
+  $("ck-fee").onchange = e=>{ s.complete.fee=e.target.checked; scheduleSave(); };
+  $("ck-letters").onchange = e=>{ s.complete.letters=e.target.checked; scheduleSave(); };
+  $("dr-delete").onclick = ()=>{ state.schools=state.schools.filter(x=>x.id!==s.id); scheduleSave(); closeDrawer(); render(); };
+  $("addEssay").onclick = ()=>{ s.essays.push({prompt:"",limit:"",done:false}); rebuildEssays(s); scheduleSave(); renderNonDrawer(); };
+  // milestone dates
+  document.querySelectorAll(".date-row").forEach(row=>{
+    const mid=row.dataset.mid;
+    const inp=row.querySelector("input[type=date]");
+    inp.onchange = ()=>{ if(inp.value){ s.overrides[mid]=inp.value; } else { delete s.overrides[mid]; } scheduleSave(); renderNonDrawer(); refreshDates(s); };
+    const clr=row.querySelector("[data-clear]");
+    if(clr) clr.onclick = ()=>{ delete s.overrides[mid]; scheduleSave(); renderNonDrawer(); refreshDates(s); };
+  });
+  bindEssays(s);
+}
+function bindEssays(s){
+  document.querySelectorAll(".essay").forEach(el=>{
+    const i=+el.dataset.ei; const e=s.essays[i]; if(!e) return;
+    el.querySelector(".e-done").onchange = ev=>{ e.done=ev.target.checked; scheduleSave(); renderNonDrawer(); };
+    el.querySelector(".e-prompt").oninput = ev=>{ e.prompt=ev.target.value; scheduleSave(); };
+    el.querySelector(".e-limit").oninput = ev=>{ e.limit=ev.target.value; scheduleSave(); };
+    el.querySelector(".e-del").onclick = ()=>{ s.essays.splice(i,1); rebuildEssays(s); scheduleSave(); renderNonDrawer(); };
+  });
+}
+function rebuildEssays(s){
+  const wrap=document.getElementById("essayWrap"); if(!wrap) return;
+  wrap.innerHTML = s.essays.map((e,i)=>essayHTML(e,i)).join("") ||
+    `<div class="hint">No essays added yet. Add each prompt as it comes in — the pulled text is often stale, so type or paste the real prompt and word limit.</div>`;
+  bindEssays(s);
+}
+function refreshDates(s){
+  document.querySelectorAll(".date-row").forEach(row=>{
+    const mid=row.dataset.mid; const ovr=s.overrides[mid];
+    const auto=autoMilestoneDate(s,mid);
+    const inp=row.querySelector("input[type=date]");
+    inp.disabled = !(s.received||ovr);
+    if(!ovr && auto) inp.value=fmtISO(auto);
+    row.classList.toggle("ovr", !!ovr);
+    const dl=row.querySelector(".dl");
+    dl.innerHTML = `<b>${MILES.find(m=>m.id===mid).label}</b>` + (ovr?`<button class="btn sm" data-clear="${mid}" title="Revert to auto">auto</button>`:`<span class="auto">${auto?"auto":"needs 2° date"}</span>`);
+    const clr=dl.querySelector("[data-clear]"); if(clr) clr.onclick=()=>{ delete s.overrides[mid]; scheduleSave(); renderNonDrawer(); refreshDates(s); };
+  });
+}
+function renderNonDrawer(){ renderMetrics(); renderThisWeek(); renderBoard(); }
+
+/* ============================================================
+   Global events
+   ============================================================ */
+document.addEventListener("click",e=>{
+  const opener=e.target.closest("[data-open]");
+  if(opener && !e.target.closest("a")){ openDrawer(opener.dataset.open); }
+});
+document.getElementById("scrim").addEventListener("click",closeDrawer);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&openId) closeDrawer(); });
+document.getElementById("filters").addEventListener("click",e=>{
+  const b=e.target.closest(".fchip"); if(!b) return;
+  filterPri=b.dataset.pri;
+  document.querySelectorAll(".fchip").forEach(x=>x.setAttribute("aria-pressed", x===b?"true":"false"));
+  renderBoard();
+});
+document.getElementById("search").addEventListener("input",e=>{ searchTerm=e.target.value.toLowerCase().trim(); renderBoard(); });
+document.getElementById("backupBtn").addEventListener("click",openBackup);
+document.getElementById("bscrim").addEventListener("click",closeBackup);
+document.getElementById("bclose2").addEventListener("click",closeBackup);
+document.getElementById("bcopy").addEventListener("click",doCopy);
+document.getElementById("bload").addEventListener("click",doImport);
+document.getElementById("resetBtn").addEventListener("click",()=>{
+  if(confirm("Reset the board to your original 34-school list? This clears all progress, essays, notes and date overrides.")){
+    state=defaultState(); scheduleSave(); closeDrawer(); render();
+  }
+});
+
+/* theme toggle */
+const themeBtn=document.getElementById("themeBtn");
+themeBtn.addEventListener("click",()=>{
+  const cur=document.documentElement.getAttribute("data-theme");
+  const sysDark = matchMedia("(prefers-color-scheme:dark)").matches;
+  const next = cur ? (cur==="dark"?"light":"dark") : (sysDark?"light":"dark");
+  document.documentElement.setAttribute("data-theme",next);
+  try{ localStorage.setItem("ss-theme",next); }catch(_){}
+});
+try{ const t=localStorage.getItem("ss-theme"); if(t) document.documentElement.setAttribute("data-theme",t); }catch(_){}
+
+/* ============================================================
+   Boot
+   ============================================================ */
+loadLocal();       // restore this browser's saved state immediately (survives reloads even without db)
+render();          // instant paint
+initDb();          // then sync with the shared db across devices when it resolves
+</script>
+
+</head>
+<body></body>
+</html>
